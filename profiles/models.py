@@ -9,6 +9,7 @@ class Profile(models.Model):
     avatar = models.ImageField(default='avatar.jpg', upload_to='avatars')
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
+    
 
     def __str__(self):
         return f"profile of the user {self.user.username}"

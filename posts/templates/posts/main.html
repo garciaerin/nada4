@@ -1,6 +1,9 @@
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
 {% extends "base.html" %}
- {% load static %}
- {% load crispy_forms_tags %}
+{% load static %}
+{% load crispy_forms_tags %}
 
 {% block scripts %}
     <script src="{% static 'posts/main.js' %}" defer></script>
@@ -28,6 +31,12 @@ posts
                             <button type="submit" class="btn btn-success">+ Add</button>
                         </div>
                     </form>
+                    <form action="/upload" class="dropzone dz">
+                        {% csrf_token %}
+                        <div class="fallback">
+                            <input name="file" type="file" multiple />
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -37,7 +46,6 @@ posts
     <button type="button" class="btn btn-info mb-2" data-bs-toggle="modal" data-bs-target="#addPostModal">
         Add post 
     </button>
-
 
     <div id="posts-box" ></div>
     <div id="spinner-box" class="text-center">

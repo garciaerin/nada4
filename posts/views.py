@@ -5,6 +5,8 @@ from .forms import PostForm
 from profiles.models import Profile
 from .utils import action_permission
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import redirect
+
 
 # Create your views here.
 @login_required
@@ -22,6 +24,7 @@ def post_list_and_create(request):
                 'title': instance.title,
                 'body': instance.body,
                 'author': instance.author.user.username,
+                'avatar': instance.avatar.url,
                 'id': instance.id,
             })
             
@@ -67,15 +70,17 @@ def load_posts_data_view(request, num_posts):
 
 @login_required  
 def post_detail_data_view(request, pk):
-    obj = Post.objects.get(pk=pk)
-    data = {
-        'id': obj.id,
-        'title': obj.title,
-        'body': obj.body,
-        'author': obj.author.user.username,
-        'logged_in': request.user.username,
-    }
-    return JsonResponse({'data': data})
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        obj = Post.objects.get(pk=pk)
+        data = {
+            'id': obj.id,
+            'title': obj.title,
+            'body': obj.body,
+            'author': obj.author.user.username,
+            'logged_in': request.user.username,
+        }
+        return JsonResponse({'data': data})
+    return redirect('posts:main-board')
 
 @login_required
 def like_unlike_post(request):
@@ -89,6 +94,8 @@ def like_unlike_post(request):
             liked = True
             obj.liked.add(request.user)
         return JsonResponse({'liked': liked, 'count': obj.like_count})
+    return redirect('posts:main-board')
+
 
 @login_required
 @action_permission
@@ -104,6 +111,8 @@ def update_post(request, pk):
             'title': new_title,
             'body': new_body,
         })
+    return redirect('posts:main-board')
+
 
 @login_required
 @action_permission
@@ -112,7 +121,9 @@ def delete_post(request, pk):
     if request.headers.get('x-requested-with') == 'XMLHttpRequest':
         obj.delete()
         return JsonResponse({'msg': 'some message'})
-    return JsonResponse({'msg': 'access denied - ajax only'})
+    # return JsonResponse({'msg': 'access denied - ajax only'})
+    return redirect('posts:main-board')
+
 
 @login_required
 def image_upload_view(request):
